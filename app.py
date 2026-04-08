@@ -88,7 +88,7 @@ if selected_model == "📦 Freight Cost Prediction":
             "Dollars": [dollars]
         }
 
-        prediction = predict_freight_cost(input_data)['Predicted_Freight']
+        prediction = predict_freight_cost(input_data)['Predicted_freight']
 
         st.success("Prediction completed successfully")
 
