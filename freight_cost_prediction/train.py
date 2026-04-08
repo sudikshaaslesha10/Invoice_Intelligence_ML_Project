@@ -17,7 +17,7 @@ from model_evaluation import (
 
 def main():
     # Paths
-    db_path = r"C:\Users\Sudiksha Aslesha\ML Project\inventory.db"
+    db_path = r"C:\Users\Sudiksha Aslesha\MY_PROJECTS\ML Project\inventory.db"
     model_dir = Path("models")
     model_dir.mkdir(exist_ok=True)
 
