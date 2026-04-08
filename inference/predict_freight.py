@@ -1,7 +1,10 @@
 import joblib
 import pandas as pd
 
-MODEL_PATH = r"C:\Users\Sudiksha Aslesha\MY_PROJECTS\models\freight_cost_model.pkl"
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "freight_cost_model.pkl")
 
 def load_model(model_path :str = MODEL_PATH):
     """
