@@ -1,7 +1,10 @@
 import joblib
 import pandas as pd
 
-MODEL_PATH = r"C:\Users\Sudiksha Aslesha\MY_PROJECTS\ML Project\models\predict_flag_invoice.pkl"
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "predict_flag_invoice.pkl")
 
 def load_model(model_path :str = MODEL_PATH):
     """
@@ -25,7 +28,10 @@ def predict_invoice_flag(input_data):
     """
     model=load_model()
     input_df = pd.DataFrame(input_data)
-    input_df['Predicted_Flag'] = model.predict(input_df).round()
+    
+
+    # 🔥 Prevent feature mismatch
+    input_df = input_df.reindex(columns=model.feature_names_in_, fill_value=0)
     return input_df
 
 if __name__ == "__main__":
