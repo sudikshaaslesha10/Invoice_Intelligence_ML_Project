@@ -15,23 +15,25 @@ def load_model(model_path :str = MODEL_PATH):
     return model
 
 def predict_invoice_flag(input_data):
-    """
-    Predict invoice flag for new vendor invoices.
 
-    Parameters
-    ----------
-    input_data :dict
-
-    Returns
-    ----------
-    pd.DataFrame with predicted flag
-    """
-    model=load_model()
+    model = load_model()
     input_df = pd.DataFrame(input_data)
-    
 
-    # 🔥 Prevent feature mismatch
-    input_df = input_df[["Quantity", "Dollars"]]
+    # ✅ Use exact features used during training
+    input_df = input_df.reindex(
+        columns=[
+            "invoice_quantity",
+            "invoice_dollars",
+            "Freight",
+            "total_item_quantity",
+            "total_item_dollars"
+        ],
+        fill_value=0
+    )
+
+    # ✅ Make prediction
+    input_df["Predicted Flag"] = model.predict(input_df)
+
     return input_df
 
 if __name__ == "__main__":
