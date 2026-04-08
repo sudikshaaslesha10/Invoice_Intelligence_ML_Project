@@ -28,7 +28,7 @@ This internal analytics portal leverages machine learning to:
 - **Reduce financial leakage and manual workload**
 """)
 
-st.divider() 
+st.divider()
 
 # ---------------------------------------------------
 # Sidebar
@@ -54,90 +54,108 @@ st.markdown("""
 # Freight Cost Prediction
 # ---------------------------------------------------
 
-if selected_model == "📦 Freight Cost Prediction":
+# BUG 1 FIXED: condition was "📦 Freight Cost Prediction" but radio has no emoji prefix
+if selected_model == "Freight Cost Prediction":
     st.subheader("📊 Freight Cost Prediction")
     st.markdown("""
     **Objective:**
-    Predict freight cost for a vendor invoice using **Quantity** and **Invoice Dollars** 
+    Predict freight cost for a vendor invoice using **Quantity** and **Invoice Dollars**
     to support budgeting, forecasting, and vendor negotiations.
     """)
 
- with st.form("freight_form"):
+    # BUG 2 FIXED: 'with' block had 1 extra leading space — caused IndentationError
+    with st.form("freight_form"):
         col1, col2 = st.columns(2)
 
         with col1:
             quantity = st.number_input(
-                "Quantity", 
-                min_value=1, 
+                "Quantity",
+                min_value=1,
                 value=1200
             )
         with col2:
             dollars = st.number_input(
-                "Invoice Dollars", 
-                min_value=1.0, 
+                "Invoice Dollars",
+                min_value=1.0,
                 value=18500.0
             )
 
-        submit_freight = st.form_submit_button("Predict freight Cost")
+        submit_freight = st.form_submit_button("Predict Freight Cost")
 
-     if submit_freight:
-         input_data =
-         {"Quantity": [quantity],
-        "Dollars": [dollars]
-            }
+    # BUG 3 FIXED: 'if submit_freight' must sit OUTSIDE the form (unindented one level)
+    # and input_data dict was broken — assignment operator was on wrong line
+    if submit_freight:
+        input_data = {
+            "Quantity": [quantity],
+            "Dollars": [dollars]
+        }
 
-         prediction = predict_freight_cost(input_data)['Predicted_Freight']
+        prediction = predict_freight_cost(input_data)['Predicted_Freight']
 
-         st.success("Prediction completed successfully")
+        st.success("Prediction completed successfully")
 
-         st.metric(
-                 label = "📊 Estimated Freight Cost",
-                 value= f"$(prediction[0]:,.2f)"
-         )
-
+        # BUG 4 FIXED: f-string used $( instead of ${ — value never interpolated
+        st.metric(
+            label="📊 Estimated Freight Cost",
+            value=f"${prediction[0]:,.2f}"
+        )
 
 # ---------------------------------------------------
 # Invoice Flag Prediction
 # ---------------------------------------------------
-else:
+elif selected_model == "Invoice Flag Prediction":
     st.subheader("📋 Invoice Flag Prediction")
     st.markdown("""
     **Objective:**
-    Predict if a vendor invoice should be **flagged for manual approval** based on abnormal cost, freight or delivery patterns. 
+    Predict if a vendor invoice should be **flagged for manual approval**
+    based on abnormal cost, freight or delivery patterns.
     """)
+
     with st.form("invoice_flag_form"):
-        col1, col2 = st.columns(3)
+        # BUG 5 FIXED: st.columns(3) must unpack all 3 — original only unpacked col1, col2
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             invoice_quantity = st.number_input(
-                "Invoice Quantity", 
-                min_value=1, 
+                "Invoice Quantity",
+                min_value=1,
                 value=50
             )
             freight = st.number_input(
-                "Freight_Cost",
-                min_value =0.0,
-                value =1.73
+                "Freight Cost",
+                min_value=0.0,
+                value=1.73
+            )
+            # BUG 6 FIXED: total_item_quantity was used in input_data but never defined
+            total_item_quantity = st.number_input(
+                "Total Item Quantity",
+                min_value=1,
+                value=100
             )
         with col2:
             invoice_dollars = st.number_input(
-                "Invoice Dollars", 
-                min_value=1.0, 
+                "Invoice Dollars",
+                min_value=1.0,
                 value=352.95
             )
         with col3:
             total_item_dollars = st.number_input(
-                "Total Item Dollars", 
-                min_value=1.0, 
+                "Total Item Dollars",
+                min_value=1.0,
                 value=2476.0
             )
 
         submit_flag = st.form_submit_button("Evaluate Invoice Risk")
 
     if submit_flag:
-        input_data = {"Invoice_Quantity": [invoice_quantity], "Invoice_Dollars": [invoice_dollars],"Freight": ["freight"],
-                      "total_item_quantity": [total_item_quantity],
-                      "total_item_dollars": [total_item_dollars]}
+        # BUG 7 FIXED: "freight" was a string literal — should be the variable freight
+        input_data = {
+            "invoice_quantity": [invoice_quantity],
+            "invoice_dollars": [invoice_dollars],
+            "Freight": [freight],
+            "total_item_quantity": [total_item_quantity],
+            "total_item_dollars": [total_item_dollars]
+        }
 
         flag_prediction = predict_invoice_flag(input_data)['Predicted Flag']
 
@@ -147,4 +165,6 @@ else:
             st.error("🚨 Invoice requires **MANUAL APPROVAL**")
         else:
             st.success("✅ Invoice is **SAFE FOR Auto-Approval**")
-        
+
+elif selected_model == "Both":
+    st.info("Use the sidebar to switch between Freight Cost Prediction and Invoice Flag Prediction.")
