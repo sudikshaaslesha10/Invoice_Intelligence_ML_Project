@@ -19,7 +19,7 @@ st.set_page_config(
 # Header Section
 # ------------------------------
 st.markdown("""
-# Vendor Invoice Intelligence Portal
+# 📦 Vendor Invoice Intelligence Portal
 ### AI-Driven Freight Cost Prediction & Invoice Risk Flagging
 
 This internal analytics portal leverages machine learning to:
@@ -34,28 +34,29 @@ st.divider()
 # Sidebar
 # ---------------------------------------------------
 st.sidebar.title("🔍 Model Selection")
+
 selected_model = st.sidebar.radio(
     "Choose Prediction Module",
     [
-        "Freight Cost Prediction",
-        "Invoice Flag Prediction",
-        "Both"
+        "📦 Freight Cost Prediction",
+        "🚨 Invoice Manual Approval Flag",
+        "📊 Both"
     ]
 )
 
-st.markdown("""
-**Business Impact**
-- Improved cost forecasting
-- Reduced invoice fraud & anomalies
-- Faster finance operations
+# ✅ Business Impact moved to sidebar
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 💼 Business Impact")
+st.sidebar.markdown("""
+- 📈 Improved cost forecasting  
+- 🔍 Reduced invoice fraud & anomalies  
+- ⚡ Faster finance operations  
 """)
 
 # ---------------------------------------------------
 # Freight Cost Prediction
 # ---------------------------------------------------
-
-# BUG 1 FIXED: condition was "📦 Freight Cost Prediction" but radio has no emoji prefix
-if selected_model == "Freight Cost Prediction":
+if selected_model == "📦 Freight Cost Prediction":
     st.subheader("📊 Freight Cost Prediction")
     st.markdown("""
     **Objective:**
@@ -63,7 +64,6 @@ if selected_model == "Freight Cost Prediction":
     to support budgeting, forecasting, and vendor negotiations.
     """)
 
-    # BUG 2 FIXED: 'with' block had 1 extra leading space — caused IndentationError
     with st.form("freight_form"):
         col1, col2 = st.columns(2)
 
@@ -80,10 +80,8 @@ if selected_model == "Freight Cost Prediction":
                 value=18500.0
             )
 
-        submit_freight = st.form_submit_button("Predict Freight Cost")
+        submit_freight = st.form_submit_button("🚀 Predict Freight Cost")
 
-    # BUG 3 FIXED: 'if submit_freight' must sit OUTSIDE the form (unindented one level)
-    # and input_data dict was broken — assignment operator was on wrong line
     if submit_freight:
         input_data = {
             "Quantity": [quantity],
@@ -94,7 +92,6 @@ if selected_model == "Freight Cost Prediction":
 
         st.success("Prediction completed successfully")
 
-        # BUG 4 FIXED: f-string used $( instead of ${ — value never interpolated
         st.metric(
             label="📊 Estimated Freight Cost",
             value=f"${prediction[0]:,.2f}"
@@ -103,8 +100,8 @@ if selected_model == "Freight Cost Prediction":
 # ---------------------------------------------------
 # Invoice Flag Prediction
 # ---------------------------------------------------
-elif selected_model == "Invoice Flag Prediction":
-    st.subheader("📋 Invoice Flag Prediction")
+elif selected_model == "🚨 Invoice Manual Approval Flag":
+    st.subheader("🚨 Invoice Manual Approval Prediction")
     st.markdown("""
     **Objective:**
     Predict if a vendor invoice should be **flagged for manual approval**
@@ -112,7 +109,6 @@ elif selected_model == "Invoice Flag Prediction":
     """)
 
     with st.form("invoice_flag_form"):
-        # BUG 5 FIXED: st.columns(3) must unpack all 3 — original only unpacked col1, col2
         col1, col2, col3 = st.columns(3)
 
         with col1:
@@ -126,7 +122,6 @@ elif selected_model == "Invoice Flag Prediction":
                 min_value=0.0,
                 value=1.73
             )
-            # BUG 6 FIXED: total_item_quantity was used in input_data but never defined
             total_item_quantity = st.number_input(
                 "Total Item Quantity",
                 min_value=1,
@@ -145,10 +140,9 @@ elif selected_model == "Invoice Flag Prediction":
                 value=2476.0
             )
 
-        submit_flag = st.form_submit_button("Evaluate Invoice Risk")
+        submit_flag = st.form_submit_button("🔍 Evaluate Invoice Risk")
 
     if submit_flag:
-        # BUG 7 FIXED: "freight" was a string literal — should be the variable freight
         input_data = {
             "invoice_quantity": [invoice_quantity],
             "invoice_dollars": [invoice_dollars],
@@ -166,5 +160,8 @@ elif selected_model == "Invoice Flag Prediction":
         else:
             st.success("✅ Invoice is **SAFE FOR Auto-Approval**")
 
-elif selected_model == "Both":
+# ---------------------------------------------------
+# Both Option
+# ---------------------------------------------------
+elif selected_model == "📊 Both":
     st.info("Use the sidebar to switch between Freight Cost Prediction and Invoice Flag Prediction.")
