@@ -5,7 +5,32 @@ import plotly.express as px
 
 from inference.predict_freight import predict_freight_cost
 from inference.predict_invoice_flag import predict_invoice_flag
+def explain_flag(input_data):
+    reasons = []
 
+    qty = input_data.get("invoice_quantity", [0])[0]
+    dollars = input_data.get("invoice_dollars", [0])[0]
+    freight = input_data.get("Freight", [0])[0]
+    total_qty = input_data.get("total_item_quantity", [0])[0]
+    total_dollars = input_data.get("total_item_dollars", [0])[0]
+
+    # Rule 1: Value mismatch
+    if abs(dollars - total_dollars) > 5:
+        reasons.append("💰 Invoice amount does not match total item dollars")
+
+    # Rule 2: High cost per unit
+    if qty > 0 and (dollars / qty) > 3000:
+        reasons.append("📈 Unusually high cost per item")
+
+    # Rule 3: High freight
+    if dollars > 0 and (freight / dollars) > 0.1:
+        reasons.append("🚚 Freight cost is unusually high")
+
+    # Rule 4: Quantity mismatch
+    if qty != total_qty:
+        reasons.append("📦 Invoice quantity differs from total quantity")
+
+    return reasons
 # ------------------------------
 # Page Configuration
 # ------------------------------
@@ -157,6 +182,13 @@ elif selected_model == "🚨 Invoice Manual Approval Flag":
 
         if is_flagged:
             st.error("🚨 Invoice requires **MANUAL APPROVAL**")
+             # ✅ Add explanation
+        reasons = explain_flag(input_data)
+    
+        st.subheader("🔍 Why this was flagged:")
+        for r in reasons:
+            st.write(f"- {r}")
+
         else:
             st.success("✅ Invoice is **SAFE FOR Auto-Approval**")
 
