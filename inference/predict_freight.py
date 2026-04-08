@@ -28,9 +28,9 @@ def predict_freight_cost(input_data):
     """
     model=load_model()
     input_df = pd.DataFrame(input_data)
-    
-    # ✅ Ensure correct feature order (VERY IMPORTANT)
-    input_df = input_df[["Quantity", "Dollars"]]
+
+    # 🔥 Automatically match training features
+    input_df = input_df.reindex(columns=model.feature_names_in_, fill_value=0)
     
     input_df['Predicted_freight'] = model.predict(input_df).round()
     return input_df
@@ -38,7 +38,10 @@ def predict_freight_cost(input_data):
 if __name__ == "__main__":
 
     # Example inference run (local testing)
-    sample_data = {"Dollars": [18500,9000,3000,200]}
+    sample_data = {
+    "Quantity": [100, 200, 150, 50],
+    "Dollars": [18500, 9000, 3000, 200]
+}
     prediction = predict_freight_cost(sample_data)
     print(prediction)
 
