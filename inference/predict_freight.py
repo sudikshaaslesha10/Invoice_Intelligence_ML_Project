@@ -28,6 +28,10 @@ def predict_freight_cost(input_data):
     """
     model=load_model()
     input_df = pd.DataFrame(input_data)
+    
+    # ✅ Ensure correct feature order (VERY IMPORTANT)
+    input_df = input_df[["Quantity", "Dollars"]]
+    
     input_df['Predicted_freight'] = model.predict(input_df).round()
     return input_df
 
