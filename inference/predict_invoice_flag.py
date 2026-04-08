@@ -31,7 +31,7 @@ def predict_invoice_flag(input_data):
     
 
     # 🔥 Prevent feature mismatch
-    input_df = input_df.reindex(columns=model.feature_names_in_, fill_value=0)
+    input_df = input_df[["Quantity", "Dollars"]]
     return input_df
 
 if __name__ == "__main__":
